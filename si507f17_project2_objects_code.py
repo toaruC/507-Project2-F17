@@ -14,6 +14,7 @@ import unittest
 
 print("\n*** *** PROJECT 2 *** ***\n")
 
+
 ## Useful additional references for this part of the homework from outside class material:
 ## - the iTunes Search API documentation:
 ## - the following chapters from the textbook (also referred to in SI 506): https://www.programsinformationpeople.org/runestone/static/publicpy3/Classes/ThinkingAboutClasses.html, https://www.programsinformationpeople.org/runestone/static/publicpy3/Classes/ClassesHoldingData.html, https://www.programsinformationpeople.org/runestone/static/publicpy3/UsingRESTAPIs/cachingResponses.html
@@ -41,40 +42,40 @@ def params_unique_combination(baseurl, params_d, private_keys=["api_key"]):
             res.append("{}-{}".format(k, params_d[k]))
     return baseurl + "_".join(res)
 
-def sample_get_cache_itunes_data(search_term,media_term="all"):
-	CACHE_FNAME = 'cache_file_name.json'
-	try:
-	    cache_file = open(CACHE_FNAME, 'r')
-	    cache_contents = cache_file.read()
-	    CACHE_DICTION = json.loads(cache_contents)
-	    cache_file.close()
-	except:
-	    CACHE_DICTION = {}
-	baseurl = "https://itunes.apple.com/search"
-	params = {}
-	params["media"] = media_term
-	params["term"] = search_term
-	unique_ident = params_unique_combination(baseurl, params)
-	if unique_ident in CACHE_DICTION:
-		return CACHE_DICTION[unique_ident]
-	else:
-		CACHE_DICTION[unique_ident] = json.loads(requests.get(baseurl, params=params).text)
-		full_text = json.dumps(CACHE_DICTION)
-		cache_file_ref = open(CACHE_FNAME,"w")
-		cache_file_ref.write(full_text)
-		cache_file_ref.close()
-		return CACHE_DICTION[unique_ident]
+
+def sample_get_cache_itunes_data(search_term, media_term="all"):
+    CACHE_FNAME = 'cache_file_name.json'
+    try:
+        cache_file = open(CACHE_FNAME, 'r')
+        cache_contents = cache_file.read()
+        CACHE_DICTION = json.loads(cache_contents)
+        cache_file.close()
+    except:
+        CACHE_DICTION = {}
+    baseurl = "https://itunes.apple.com/search"
+    params = {}
+    params["media"] = media_term
+    params["term"] = search_term
+    unique_ident = params_unique_combination(baseurl, params)
+    if unique_ident in CACHE_DICTION:
+        return CACHE_DICTION[unique_ident]
+    else:
+        CACHE_DICTION[unique_ident] = json.loads(requests.get(baseurl, params=params).text)
+        full_text = json.dumps(CACHE_DICTION)
+        cache_file_ref = open(CACHE_FNAME, "w")
+        cache_file_ref.write(full_text)
+        cache_file_ref.close()
+        return CACHE_DICTION[unique_ident]
 
 
 ## [PROBLEM 1] [250 POINTS]
 print("\n***** PROBLEM 1 *****\n")
 
-
 ## For problem 1, you should define a class Media, representing ANY piece of media you can find on iTunes search.
 
 
 ## The Media class constructor should accept one dictionary data structure representing a piece of media from iTunes as input to the constructor.
-## It should instatiate at least the following instance variables:
+## It should instantiate at least the following instance variables:
 ## - title
 ## - author
 ## - itunes_URL
@@ -87,9 +88,27 @@ print("\n***** PROBLEM 1 *****\n")
 ## - a special contains method (for the in operator) which takes one additional input, as all contains methods must, which should always be a string, and checks to see if the string input to this contains method is INSIDE the string representing the title of this piece of media (the title instance variable)
 
 
-##Code Body Goes Here:
-class Media(objects):
-    
+## Code Body Goes Here:
+class Media(object):
+	def __init__(self, search_result):
+		self.title = search_result["trackCensoredName"]
+		self.author = search_result["artistName"]
+		self.itunes_URL = search_result["trackViewUrl"]
+		self.itunes_id = search_result["trackId"]
+
+	def __str__(self):
+		return "{} by {}".format(self.title, self.author)
+
+	def __repr__(self):
+		return "ITUNES MEDIA: {}".format(self.itunes_id)
+
+	def __len__(self):
+		return 0
+
+	def __contains__(self, name):
+		return name in self.title
+
+
 
 
 
@@ -141,10 +160,9 @@ print("\n***** PROBLEM 3 *****\n")
 
 media_samples = sample_get_cache_itunes_data("love")["results"]
 
-song_samples = sample_get_cache_itunes_data("love","music")["results"]
+song_samples = sample_get_cache_itunes_data("love", "music")["results"]
 
-movie_samples = sample_get_cache_itunes_data("love","movie")["results"]
-
+movie_samples = sample_get_cache_itunes_data("love", "movie")["results"]
 
 ## You may want to do some investigation on these variables to make sure you understand correctly what type of value they hold, what's in each one!
 
