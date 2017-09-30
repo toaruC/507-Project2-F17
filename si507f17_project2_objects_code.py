@@ -154,7 +154,7 @@ class Song(Media):
         self.album = search_result["collectionName"]
         self.track_number = search_result["trackNumber"]
         self.genre = search_result["primaryGenreName"]
-        self.track_time_seconds = (search_result["trackTimeMillis"]/1000)
+        self.track_time_seconds = int(search_result["trackTimeMillis"]/1000)
 
     def __len__(self):
         print(self.track_time_seconds)
@@ -166,7 +166,7 @@ class Movie(Media):
         super().__init__(search_result)
         self.rating = search_result["contentAdvisoryRating"]
         self.genre = search_result["primaryGenreName"]
-        self.track_time_minutes = (search_result["trackTimeMillis"]/(1000*60))
+        self.track_time_minutes = int(search_result["trackTimeMillis"]/(1000*60))
         # to check if description is None
         if search_result["longDescription"] is not None:
             self.description = search_result["longDescription"]
