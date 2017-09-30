@@ -91,10 +91,12 @@ print("\n***** PROBLEM 1 *****\n")
 ## Code Body Goes Here:
 class Media(object):
 	def __init__(self, search_result):
+		# self.kind = search_result["kind"]
 		self.title = search_result["trackCensoredName"]
 		self.author = search_result["artistName"]
 		self.itunes_URL = search_result["trackViewUrl"]
 		self.itunes_id = search_result["trackId"]
+
 
 	def __str__(self):
 		return "{} by {}".format(self.title, self.author)
@@ -107,9 +109,6 @@ class Media(object):
 
 	def __contains__(self, name):
 		return name in self.title
-
-
-
 
 
 ## [PROBLEM 2] [400 POINTS]
@@ -147,6 +146,42 @@ print("\n***** PROBLEM 2 *****\n")
 
 ## Should have an additional method called title_words_num that returns an integer representing the number of words in the movie description. If there is no movie description, this method should return 0.
 
+
+## Code Body Goes Here:
+class Song(Media):
+    def __init__(self, search_result):
+        super().__init__(search_result)
+        self.album = search_result["collectionName"]
+        self.track_number = search_result["trackNumber"]
+        self.genre = search_result["primaryGenreName"]
+        self.track_time_seconds = (search_result["trackTimeMillis"]/1000)
+
+    def __len__(self):
+        print(self.track_time_seconds)
+        return self.track_time_seconds
+
+
+class Movie(Media):
+    def __init__(self, search_result):
+        super().__init__(search_result)
+        self.rating = search_result["contentAdvisoryRating"]
+        self.genre = search_result["primaryGenreName"]
+        self.track_time_minutes = (search_result["trackTimeMillis"]/(1000*60))
+        # to check if description is None
+        if search_result["longDescription"] is not None:
+            self.description = search_result["longDescription"]
+        else:
+            self.description = None
+
+    def __len__(self):
+        print(self.track_time_minutes)
+        return self.track_time_minutes
+
+    def title_words_num(self):
+        if self.description is not None:
+            return len(self.description.split())
+        else:
+            return 0
 
 
 ## [PROBLEM 3] [150 POINTS]
