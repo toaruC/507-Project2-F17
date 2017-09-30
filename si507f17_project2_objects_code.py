@@ -97,7 +97,6 @@ class Media(object):
 		self.itunes_URL = search_result["trackViewUrl"]
 		self.itunes_id = search_result["trackId"]
 
-
 	def __str__(self):
 		return "{} by {}".format(self.title, self.author)
 
@@ -154,10 +153,13 @@ class Song(Media):
         self.album = search_result["collectionName"]
         self.track_number = search_result["trackNumber"]
         self.genre = search_result["primaryGenreName"]
-        self.track_time_seconds = int(search_result["trackTimeMillis"]/1000)
+        # to check if track_time_seconds exists
+        if "trackTimeMillis" in search_result.keys() and search_result["trackTimeMillis"] is not None:
+            self.track_time_seconds = int(search_result["trackTimeMillis"] / 1000)
+        else:
+            self.track_time_seconds = -1
 
     def __len__(self):
-        print(self.track_time_seconds)
         return self.track_time_seconds
 
 
@@ -166,15 +168,19 @@ class Movie(Media):
         super().__init__(search_result)
         self.rating = search_result["contentAdvisoryRating"]
         self.genre = search_result["primaryGenreName"]
-        self.track_time_minutes = int(search_result["trackTimeMillis"]/(1000*60))
+        # to check if track_time_minutes exists
+        if "trackTimeMillis" in search_result.keys() and search_result["trackTimeMillis"] is not None:
+            self.track_time_minutes = int(search_result["trackTimeMillis"]/(1000*60))
+        else:
+            self.track_time_minutes = -1
+
         # to check if description is None
-        if search_result["longDescription"] is not None:
+        if "longDescription" in search_result.keys() and search_result["longDescription"] is not None:
             self.description = search_result["longDescription"]
         else:
             self.description = None
 
     def __len__(self):
-        print(self.track_time_minutes)
         return self.track_time_minutes
 
     def title_words_num(self):
@@ -210,6 +216,18 @@ movie_samples = sample_get_cache_itunes_data("love", "movie")["results"]
 ## You may use any method of accumulation to make that happen.
 
 
+# Code Body Goes Here:
+media_list = []
+for media_sample in media_samples:
+    media_list.append(Media(media_sample))
+
+song_list = []
+for song_sample in song_samples:
+    song_list.append(Song(song_sample))
+
+movie_list = []
+for movie_sample in movie_samples:
+    movie_list.append(Movie(movie_sample))
 
 
 ## [PROBLEM 4] [200 POINTS]
