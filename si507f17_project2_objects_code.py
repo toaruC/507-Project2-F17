@@ -157,7 +157,7 @@ class Song(Media):
         if "trackTimeMillis" in search_result.keys() and search_result["trackTimeMillis"] is not None:
             self.track_time_seconds = int(search_result["trackTimeMillis"] / 1000)
         else:
-            self.track_time_seconds = -1
+            self.track_time_seconds = 0  # set 0 if no trackTimeMillis
 
     def __len__(self):
         return self.track_time_seconds
@@ -172,7 +172,7 @@ class Movie(Media):
         if "trackTimeMillis" in search_result.keys() and search_result["trackTimeMillis"] is not None:
             self.track_time_minutes = int(search_result["trackTimeMillis"]/(1000*60))
         else:
-            self.track_time_minutes = -1
+            self.track_time_minutes = 0  # set 0 if no trackTimeMillis
 
         # to check if description is None
         if "longDescription" in search_result.keys() and search_result["longDescription"] is not None:
@@ -234,9 +234,9 @@ for movie_sample in movie_samples:
 print("\n***** PROBLEM 4 *****\n")
 
 ## Finally, write 3 CSV files:
-# - movies.csv
-# - songs.csv
-# - media.csv
+# - movies.resources
+# - songs.resources
+# - media.resources
 
 ## Each of those CSV files should have 5 columns each:
 # - title
@@ -258,3 +258,42 @@ print("\n***** PROBLEM 4 *****\n")
 ## HINT #3: Check out the sections in the textbook on opening and writing files, and the section(s) on CSV files!
 
 ## HINT #4: Write or draw out your plan for this before you actually start writing the code! That will make it much easier.
+
+
+# Code Body Goes Here:
+
+# convert_media_to_csv function - convert strings with comma in an instance of Media or children classes to fit the formatting in .CSV
+def convert_media_to_csv(media_instance):
+    media_row_strings = [media_instance.title, media_instance.author, media_instance.itunes_id, media_instance.itunes_URL, len(media_instance)]
+    csv_row_strings = []
+
+    for s in media_row_strings:
+        if type(s) == str:
+            if ',' in s:
+                csv_row_strings.append('"' + s + '"')
+            else:
+                csv_row_strings.append(s)
+
+        else:
+            csv_row_strings.append(s)
+
+    return csv_row_strings
+
+
+def write_csv_resources(mlist, mdir):
+    outfile = open(mdir, "w")  # dir is the directory of csv file
+    header_columns = ["title", "artist", "id", "url", "length"]  # define header
+    outfile.write('{}, {}, {}, {}, {}\n'.format(*header_columns))
+    for item in mlist:
+        outfile.write('{}, {}, {}, {}, {}\n'.format(*convert_media_to_csv(item)))
+    outfile.close()
+
+
+# write movies.resources
+write_csv_resources(movie_list, "movies.resources.csv")
+
+# write songs.resources
+write_csv_resources(song_list, "songs.resources.csv")
+
+# write media.resources
+write_csv_resources(media_list, "media.resources.csv")
